@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+
+{% block title %}
+{{ title }} :: {{ block.super }}
+{% endblock %}
+
+{% block sidebar %}
+{% include 'inc/_sidebar.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="card mb-3" style="width: 1300px;">
+  {{ forloop.counter }}
+  <div class="card-header">
+    Категория: <a href="{{ notes_item.category.get_absolute_url }}">{{ notes_item.category.title }}</a>
+  </div>
+  <div class="card-body">
+    {% if notes_item.photo %}
+    <img src="{{ notes_item.photo.url }}" class="mr-3" width="1000" height="600" alt="Photo" style="margin-left: 140px;">
+    {% else %}
+    <h6> Фото нет </h6>
+    {%endif%}
+  </div>
+  <h5 class="card-title {% cycle 'text-success' 'text-danger' 'text-primary'%}" style="margin-left: 450px;">{{ notes_item.title }}</h5>
+  <div class="content" style="margin: 15px;">
+    {% autoescape off %}
+    <p class="card-text">{{ notes_item.content|linebreaks }}</p>
+    {% endautoescape%}
+  </div>
+  <h2 style="margin-left: 390px;">Оставьте свой комментарий!</h2>
+  <div id="comments_section">
+    {% if user.is_authenticated %}
+    <form method="POST" style="margin-left: 250px;">
+      {% csrf_token %}
+      <div class="form-group">
+        {{ comment_form }}
+      </div>
+      <button class="btn btn-info" type="submit" style="margin-left: 265px;">Добавить комментарий <i class="fas fa-comments"></i></button>
+    </form>
+    {% else %}
+    <a class="btn btn-outline-info" href="{% url 'Logout' %}?next={{request.path}}" style="margin-left: 420px;">Авторизуйтесь, чтобы оставить комментарий!</a><br>
+    {% endif %}
+    {% if comments %}
+    <strong class="text-secondary" style="margin-left: 15px;">{{ object.number_of_comments }} Comment{{ object.number_of_comments|pluralize }}</strong>
+    <hr>
+    <ul>
+      {% for comment in comments %}
+      <li>
+        <div>
+          <span>
+            <strong class="text-info">{{ comment.username }} </strong>
+            <small class="text-muted">{{ comment.created }}</small>
+          </span>
+          <p>
+            {{ comment.text|safe }}
+          </p>
+        </div>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <strong class="text-secondary" style="margin-left: 15px;">Комментариев пока нет(</strong>
+    {% endif %}
+  </div>
+  <div class="card-footer text-body-secondary">
+    <div class="date" style="margin-left: 500px;">
+      {{ notes_item.created_at|date:'Y-m-d H:i' }}
+    </div>
+  </div>
+</div>
+{% endblock %}

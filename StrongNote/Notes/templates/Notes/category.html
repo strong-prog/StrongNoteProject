@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+
+{% block title %}
+{{ category.title }} :: {{ block.super }}
+{% endblock %}
+
+{% block sidebar %}
+{% include 'inc/_sidebar.html' %}
+{% endblock %}
+
+{% block content %}
+{% for items in notes %}
+<div class="card mb-3">
+  {{ forloop.counter }}
+  <div class="card-header">
+    Категория: <a href="{% url 'Category' items.category.pk %}">{{ items.category}}</a>
+  </div>
+  <div class="media" style="display:flex">
+    <div class="media-photo">
+      {% if items.photo %}
+      <img src="{{ items.photo.url }}" class="mr-3" width="350" alt="Photo">
+      {% else %}
+      <h6> Фото нет </h6>
+      {%endif%}
+    </div>
+    <div class="media-body">
+      <h5 class="card-title {% cycle 'text-success' 'text-danger' 'text-primary'%}">{{ items.title }}</h5>
+      {% autoescape off %}
+      <p class="card-text">{{ items.content|truncatewords:60|linebreaks }}</p>
+      {% endautoescape%}
+      <a href="{{ items.get_absolute_url }}" class="btn btn-primary">Read more...</a>
+      </div>
+    </div>
+  <div class="card-footer text-body-secondary">
+    {{ items.created_at|date:'Y-m-d H:i' }}
+  </div>
+</div>
+{% endfor %}
+{% endblock %}
